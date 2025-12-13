@@ -20,6 +20,7 @@ import (
 	"github.com/evrone/go-clean-template/pkg/logger"
 	natsRPCServer "github.com/evrone/go-clean-template/pkg/nats/nats_rpc/server"
 	"github.com/evrone/go-clean-template/pkg/postgres"
+	"github.com/evrone/go-clean-template/pkg/redis"
 	rmqRPCServer "github.com/evrone/go-clean-template/pkg/rabbitmq/rmq_rpc/server"
 )
 
@@ -33,6 +34,13 @@ func Run(cfg *config.Config) { //nolint: gocyclo,cyclop,funlen,gocritic,nolintli
 		l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
 	}
 	defer pg.Close()
+
+	// Redis
+	rdb, err := redis.New(cfg.Redis.URL, redis.PoolSize(cfg.Redis.PoolSize), redis.DB(cfg.Redis.DB))
+	if err != nil {
+		l.Fatal(fmt.Errorf("app - Run - redis.New: %w", err))
+	}
+	defer rdb.Close()
 
 	// Use-Case
 	translationUseCase := translation.New(

@@ -16,6 +16,7 @@ type (
 		GRPC    GRPC
 		RMQ     RMQ
 		NATS    NATS
+		Redis   Redis
 		Metrics Metrics
 		Swagger Swagger
 	}
@@ -59,6 +60,13 @@ type (
 	NATS struct {
 		ServerExchange string `env:"NATS_RPC_SERVER,required"`
 		URL            string `env:"NATS_URL,required"`
+	}
+
+	// Redis -.
+	Redis struct {
+		URL      string `env:"REDIS_URL,required"`
+		PoolSize int    `env:"REDIS_POOL_SIZE" envDefault:"10"`
+		DB       int    `env:"REDIS_DB" envDefault:"0"`
 	}
 
 	// Metrics -.

@@ -35,6 +35,10 @@ x-backend-app-environment: &x-backend-app-environment
   # NATS
   NATS_RPC_SERVER: "rpc_server"
   NATS_URL: "nats://guest:guest@nats:4222/"
+  # Redis
+  REDIS_URL: "redis://redis:6379/0"
+  REDIS_POOL_SIZE: "10"
+  REDIS_DB: "0"
   # Metrics
   METRICS_ENABLED: "true"
   # Swagger
@@ -85,6 +89,19 @@ services:
         aliases:
           - nats.lvh.me
 
+  redis:
+    container_name: redis
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      app_network:
+        aliases:
+          - redis.lvh.me
+    command: redis-server --appendonly yes
+
   app:
     container_name: app
     platform: linux/amd64
@@ -99,6 +116,7 @@ services:
     depends_on:
       - db
       - rabbitmq
+      - redis
     deploy:
       resources:
         limits:
@@ -137,3 +155,4 @@ volumes:
   db_data:
   rabbitmq_data:
   nats_data:
+  redis_data:
